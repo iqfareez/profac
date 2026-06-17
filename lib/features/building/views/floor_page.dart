@@ -62,11 +62,12 @@ class _FloorPageState extends State<FloorPage> {
                                   (floor.color ?? '').replaceAll('#', 'FF'),
                                   radix: 16) ??
                               0xffee2299)
-                          .withOpacity(currentFloor == null
-                              ? 1.0
-                              : currentFloor?.id == floor.id
+                          .withValues(
+                              alpha: currentFloor == null
                                   ? 1.0
-                                  : 0.3),
+                                  : currentFloor?.id == floor.id
+                                      ? 1.0
+                                      : 0.3),
                       floor: floor,
                       onFloorSelected: (floor) {
                         setState(() {

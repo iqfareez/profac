@@ -125,14 +125,14 @@ class _HomeState extends State<Home> {
               return SearchBar(
                 // amende do ni serabut je MaterialStateProperty lah guna je la
                 // colors tu
-                surfaceTintColor: MaterialStateProperty.all<Color>(
+                surfaceTintColor: WidgetStateProperty.all<Color>(
                     Theme.of(context).colorScheme.surface),
-                backgroundColor: MaterialStateProperty.all<Color>(
+                backgroundColor: WidgetStateProperty.all<Color>(
                     Theme.of(context).colorScheme.surface),
-                overlayColor: MaterialStateProperty.all<Color>(
+                overlayColor: WidgetStateProperty.all<Color>(
                     Theme.of(context).colorScheme.surface),
                 controller: controller,
-                padding: const MaterialStatePropertyAll<EdgeInsets>(
+                padding: const WidgetStatePropertyAll<EdgeInsets>(
                     EdgeInsets.symmetric(horizontal: 16.0)),
                 onTap: () {
                   controller.openView();

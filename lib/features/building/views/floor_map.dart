@@ -107,7 +107,7 @@ class _FloorMapState extends State<FloorMap> with TickerProviderStateMixin {
               // HACK: When I go back, I got this vague error '!_debugDisposed': is not true.
               // DOn't have time to debug this, so here is quick, dirty and horrible solution
               Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                return Home();
+                return const Home();
               }));
             },
           ),
