@@ -37,7 +37,6 @@ class _HomeState extends State<Home> {
         // label: 'KOE E1 L1',
         points: points,
         color: Colors.pink.withAlpha(70),
-        isFilled: true,
       );
       polygons.add(myPolygon);
     }
@@ -80,7 +79,9 @@ class _HomeState extends State<Home> {
                 },
                 onMapReady: () async {
                   final myPos = await Geolocator.getCurrentPosition(
-                      desiredAccuracy: LocationAccuracy.best);
+                      locationSettings: const LocationSettings(
+                          accuracy: LocationAccuracy.best));
+
                   mapController.move(
                       LatLng(myPos.latitude, myPos.longitude), 18);
                 },
@@ -88,7 +89,7 @@ class _HomeState extends State<Home> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.app_hackathon',
+                  userAgentPackageName: 'com.iqfareez.cari_venue',
                 ),
                 PolygonLayer(polygons: polygons),
                 MarkerLayer(
@@ -173,7 +174,8 @@ class _HomeState extends State<Home> {
         onPressed: () async {
           setState(() => isDetectingLocation = true);
           final myPos = await Geolocator.getCurrentPosition(
-              desiredAccuracy: LocationAccuracy.best);
+              locationSettings:
+                  const LocationSettings(accuracy: LocationAccuracy.best));
 
           mapController.move(LatLng(myPos.latitude, myPos.longitude), 19);
 

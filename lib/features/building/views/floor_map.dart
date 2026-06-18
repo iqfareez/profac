@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_drawing/path_drawing.dart';
 import 'package:xml/xml.dart';
+import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 import '../../home/views/home_page.dart';
 import '../models/floor_data.dart';
@@ -55,9 +56,9 @@ class _FloorMapState extends State<FloorMap> with TickerProviderStateMixin {
     Rect out = alignment.inscribe(fittedSrc, dst);
 
     return Matrix4.identity()
-      ..translate(out.left, out.top)
-      ..scale(scaleX, scaleY)
-      ..translate(-src.left, -src.top);
+      ..translateByVector3(Vector3(out.left, out.top, 0))
+      ..scaleByVector3(Vector3(scaleX, scaleY, 1))
+      ..translateByVector3(Vector3(-src.left, -src.top, 0));
   }
 
   Matrix4 _zoomTo(String id, Size size) {
@@ -278,7 +279,7 @@ class ExtendedViewport extends ValueNotifier<Rect> {
   Rect innerRect = Rect.zero;
   double prevScale = 0;
 
-  _buildViewport() {
+  void _buildViewport() {
     assert(_size != Size.zero);
     final offset = ctrl.toScene(_size.center(Offset.zero));
     final scale = ctrl.value.getMaxScaleOnAxis();
@@ -361,11 +362,10 @@ class _InkFactory extends InteractiveInkFeatureFactory {
 class _InkFeature extends InteractiveInkFeature {
   _InkFeature(
       {required MaterialInkController controller,
-      required RenderBox referenceBox,
-      required Color color,
+      required super.referenceBox,
+      required super.color,
       required this.position})
-      : super(
-            controller: controller, referenceBox: referenceBox, color: color) {
+      : super(controller: controller) {
     _controller =
         AnimationController(duration: _kDuration, vsync: controller.vsync)
           ..addListener(controller.markNeedsPaint)
