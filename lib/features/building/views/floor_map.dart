@@ -33,6 +33,7 @@ class _FloorMapState extends State<FloorMap> with TickerProviderStateMixin {
   TransformationController? tctrl;
   late Animation<Matrix4> animation;
   late ExtendedViewport extendedViewport;
+  bool _didRunInitialZoom = false;
 
   @override
   void initState() {
@@ -62,8 +63,40 @@ class _FloorMapState extends State<FloorMap> with TickerProviderStateMixin {
   }
 
   Matrix4 _zoomTo(String id, Size size) {
-    return rectToRect(worldData!.rooms[id]!.rect, Offset.zero & size,
-        fit: BoxFit.contain);
+    return rectToRect(
+      worldData!.rooms[id]!.rect,
+      Offset.zero & size,
+      fit: BoxFit.contain,
+    );
+  }
+
+  void _animateToRoom(String id, Size size, {Curve curve = Curves.easeInOut}) {
+    final room = worldData?.rooms[id];
+    if (room == null || tctrl == null || !mounted) return;
+
+    final begin = tctrl!.value;
+    final end = _zoomTo(id, size);
+    if (begin == end) return;
+
+    animation = Matrix4Tween(
+      begin: begin,
+      end: end,
+    ).chain(CurveTween(curve: curve)).animate(actrl);
+    actrl.forward(from: 0);
+  }
+
+  void _scheduleInitialZoom(Size size) {
+    if (_didRunInitialZoom || widget.initialGoid == null) return;
+    _didRunInitialZoom = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _animateToRoom(
+        widget.initialGoid!,
+        size,
+        curve: Curves.easeInExpo,
+      );
+    });
   }
 
   TransformationController _initController(Size size) {
@@ -74,20 +107,6 @@ class _FloorMapState extends State<FloorMap> with TickerProviderStateMixin {
       ctrl: ctrl,
       cacheFactor: 1.75,
     );
-
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (widget.initialGoid == null) return;
-      // initial zoom to thailand
-      animation = Matrix4Tween(
-        begin: ctrl.value,
-        end: _zoomTo(widget.initialGoid!, size),
-      ).animate(actrl);
-      actrl
-        ..value = 0
-        ..animateTo(1,
-            curve: Curves.easeInExpo,
-            duration: const Duration(milliseconds: 2500));
-    });
     return ctrl;
   }
 
@@ -117,6 +136,7 @@ class _FloorMapState extends State<FloorMap> with TickerProviderStateMixin {
         body: LayoutBuilder(builder: (context, constraints) {
           tctrl ??= _initController(constraints.biggest);
           extendedViewport.size = constraints.biggest;
+          _scheduleInitialZoom(constraints.biggest);
           return ColoredBox(
             color: Colors.blueGrey.shade50,
             child: InteractiveViewer(
@@ -157,16 +177,7 @@ class _FloorMapState extends State<FloorMap> with TickerProviderStateMixin {
         child: InkWell(
           highlightColor: Colors.transparent,
           onTap: () {
-            print('${country.title} (${country.id}) clicked');
-            final begin = tctrl!.value;
-            final end = _zoomTo(country.id, size);
-            if (tctrl!.value != end) {
-              animation = Matrix4Tween(
-                begin: begin,
-                end: end,
-              ).chain(CurveTween(curve: Curves.easeInOut)).animate(actrl);
-              actrl.forward(from: 0);
-            }
+            _animateToRoom(country.id, size);
           },
           child: Center(
               child: Text(
@@ -241,7 +252,6 @@ class FloorMapDelegate extends FlowDelegate {
       context.paintChild(room.seqNo,
           transform: Matrix4.translationValues(offset.dx, offset.dy, 0));
     }
-    print('paintChildren, ${filteredRooms.map((c) => c.id)}');
   }
 
   @override
@@ -271,7 +281,6 @@ class ExtendedViewport extends ValueNotifier<Rect> {
   Size _size = Size.zero;
   set size(Size size) {
     if (size != _size) {
-      print('setting ExtendedViewport size: $size');
       _size = size;
     }
   }
