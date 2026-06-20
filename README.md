@@ -1,16 +1,14 @@
-# cari_venue
+# Profac
 
-A new Flutter project.
+Profac is a application that we build for Hackathon GDTA 2023. The hackathon theme was something like "Map" if I remember correctly. So we decided to build a application that can help people to find the nearest public facilities in the kulliyyah (faculty) in our university.
+
+The floor plan was obtained from https://github.com/KOE-Wayfind/koe-floor-plans. The floor plan was traced in Figma and exported to SVG format, which this app uses.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+The app can be ran on any platform that Flutter supports. Run the following command to run the app:
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```shell
+flutter pub get
+flutter run
+```
